@@ -37,7 +37,7 @@ export default {
     }
   },
 
-  async getFromLocation(address) {
+  async getFromLocation(address, bounds = undefined) {
     if (!this.apiKey) {
       return Promise.reject(new Error("Provided API key is invalid"));
     }
@@ -46,7 +46,12 @@ export default {
       return Promise.reject(new Error("Provided address is invalid"));
     }
 
-    const url = `${googleApiUrl}?key=${this.apiKey}&address=${encodeURI(address)}`;
+    const baseUrl = `${googleApiUrl}?key=${this.apiKey}&address=${encodeURI(address)}`;
+
+    const url = bounds ?
+      `${baseUrl}?bounds=${bounds.southwest.lat},${bounds.southwest.lng}|${bounds.northeast.lat},${bounds.northeast.lng}` :
+      baseUrl;
+
     const response = await fetch(url).catch(
       error => {
         return Promise.reject(new Error("Error fetching data"));
